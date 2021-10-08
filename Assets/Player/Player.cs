@@ -20,9 +20,9 @@ public class Player : MonoBehaviour {
     moveAmount = moveInput.normalized * speed;
 
     if (moveAmount != Vector2.zero) {
-        animator.SetBool("isRunning", true);
+      animator.SetBool("isRunning", true);
     } else {
-        animator.SetBool("isRunning", false);
+      animator.SetBool("isRunning", false);
     }
   }
 
