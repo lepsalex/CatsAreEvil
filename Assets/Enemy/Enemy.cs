@@ -1,29 +1,29 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+namespace Enemy
 {
-    public int health;
-    public float speed;
-    public int damage;
+    public class Enemy : MonoBehaviour
+    {
+        public int health;
+        public float speed;
+        public int damage;
 
-    public float attackSpeed;
-    public float timeBetweenAttacks;
+        public float attackSpeed;
+        public float timeBetweenAttacks;
     
-    [HideInInspector]
-    public Transform player;
+        [HideInInspector]
+        public Transform player;
 
-    protected virtual void Start()
-    {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-    }
+        protected virtual void Start()
+        {
+            player = GameObject.FindGameObjectWithTag("Player").transform;
+        }
 
-    public void TakeDamage(int damageAmount)
-    {
-        health -= damageAmount;
+        public void TakeDamage(int damageAmount)
+        {
+            health -= damageAmount;
 
-        if (health <= 0) Destroy(gameObject);
+            if (health <= 0) Destroy(gameObject);
+        }
     }
 }

@@ -7,36 +7,38 @@ public class Player : MonoBehaviour
     public int health;
     public float speed;
 
-    private Rigidbody2D rigidbody2d;
-    private Animator animator;
-    private Vector2 moveAmount;
+    private Rigidbody2D _rigidbody2d;
+    private Animator _animator;
+    private Vector2 _moveAmount;
+
+    private static readonly int IsRunning = Animator.StringToHash("isRunning");
 
     private void Start()
     {
-        rigidbody2d = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        _rigidbody2d = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        moveAmount = moveInput.normalized * speed;
+        var moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        _moveAmount = moveInput.normalized * speed;
 
-        if (moveAmount != Vector2.zero)
+        if (_moveAmount != Vector2.zero)
         {
-            animator.SetBool("isRunning", true);
+            _animator.SetBool(IsRunning, true);
         }
         else
         {
-            animator.SetBool("isRunning", false);
+            _animator.SetBool(IsRunning, false);
         }
     }
 
     private void FixedUpdate()
     {
-        rigidbody2d.MovePosition(rigidbody2d.position + moveAmount * Time.fixedDeltaTime);
+        _rigidbody2d.MovePosition(_rigidbody2d.position + _moveAmount * Time.fixedDeltaTime);
     }
-    
+
     public void TakeDamage(int damageAmount)
     {
         health -= damageAmount;

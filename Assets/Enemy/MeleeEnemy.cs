@@ -1,89 +1,87 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using Utils;
 
-public class MeleeEnemy : Enemy
+namespace Enemy
 {
-    public float attackRangeMoveSpeed;
-    public float stopDistance;
-
-    private float movementSpeed;
-    private float attackTime;
-
-    private RangeFinder rangeFinder;
-    private Animator animator;
-
-    private static readonly int IsAttacking = Animator.StringToHash("isAttacking");
-
-    protected override void Start()
+    public class MeleeEnemy : Enemy
     {
-        animator = GetComponent<Animator>();
+        public float attackRangeMoveSpeed;
+        public float stopDistance;
 
-        // set movementSpeed to speed by default
-        movementSpeed = speed;
+        private float _movementSpeed;
+        private float _attackTime;
 
-        // setup rangefinder component
-        rangeFinder = GetComponentInChildren<RangeFinder>();
-        rangeFinder.onEnter += OnRangeEnter;
-        rangeFinder.onExit += OnRangeExit;
+        private RangeFinder _rangeFinder;
+        private Animator _animator;
 
-        base.Start();
-    }
+        private static readonly int IsAttacking = Animator.StringToHash("isAttacking");
 
-    private void Update()
-    {
-        if (player == null) return;
-
-        if (Vector2.Distance(transform.position, player.position) > stopDistance)
+        protected override void Start()
         {
-            transform.position =
-                Vector2.MoveTowards(transform.position, player.position, movementSpeed * Time.deltaTime);
+            _animator = GetComponent<Animator>();
+
+            // set movementSpeed to speed by default
+            _movementSpeed = speed;
+
+            // setup rangefinder component
+            _rangeFinder = GetComponentInChildren<RangeFinder>();
+            _rangeFinder.onEnter += OnRangeEnter;
+            _rangeFinder.onExit += OnRangeExit;
+
+            base.Start();
         }
-        else
+
+        private void Update()
         {
-            if (Time.time >= attackTime)
+            if (player == null) return;
+
+            if (Vector2.Distance(transform.position, player.position) > stopDistance)
             {
+                transform.position =
+                    Vector2.MoveTowards(transform.position, player.position, _movementSpeed * Time.deltaTime);
+            }
+            else
+            {
+                if (!(Time.time >= _attackTime)) return;
+
                 StartCoroutine(Attack());
-                attackTime = Time.time + timeBetweenAttacks;
+                _attackTime = Time.time + timeBetweenAttacks;
             }
         }
-    }
 
-    private void OnRangeEnter(Collider2D other)
-    {
-        if (other.tag.Equals("Player"))
+        private void OnRangeEnter(Collider2D other)
         {
-            movementSpeed = attackRangeMoveSpeed;
-            animator.SetBool(IsAttacking, true);
+            if (!other.tag.Equals("Player")) return;
+
+            _movementSpeed = attackRangeMoveSpeed;
+            _animator.SetBool(IsAttacking, true);
         }
-    }
 
-    private void OnRangeExit(Collider2D other)
-    {
-        if (other.tag.Equals("Player"))
+        private void OnRangeExit(Collider2D other)
         {
-            movementSpeed = speed;
-            animator.SetBool(IsAttacking, false);
+            if (!other.tag.Equals("Player")) return;
+
+            _movementSpeed = speed;
+            _animator.SetBool(IsAttacking, false);
         }
-    }
 
-    private IEnumerator Attack()
-    {
-        player.GetComponent<Player>().TakeDamage(damage);
-
-        Vector2 originalPosition = transform.position;
-        Vector2 targetPosition = player.position;
-
-        float percent = 0;
-
-        while (percent <= 1)
+        private IEnumerator Attack()
         {
-            percent += Time.deltaTime * attackSpeed;
-            float formula = (-Mathf.Pow(percent, 2) + percent) * 4;
-            transform.position = Vector2.Lerp(originalPosition, targetPosition, formula);
-            yield return null;
+            player.GetComponent<Player>().TakeDamage(damage);
+
+            Vector2 originalPosition = transform.position;
+            Vector2 targetPosition = player.position;
+
+            float percent = 0;
+
+            while (percent <= 1)
+            {
+                percent += Time.deltaTime * attackSpeed;
+                var formula = (-Mathf.Pow(percent, 2) + percent) * 4;
+                transform.position = Vector2.Lerp(originalPosition, targetPosition, formula);
+                yield return null;
+            }
         }
     }
 }
